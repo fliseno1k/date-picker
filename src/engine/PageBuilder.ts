@@ -1,11 +1,11 @@
-import { Page, FormatingOptions } from "./Page";
+import { Page, FormattingOptions } from "./Page";
 import { Item } from './Item';
 
 export class PageBuilder {
     private date: Date | null = null;
     private title: string | null = null; 
     private items: Item[] | null = null;
-    private options: FormatingOptions | null = null;
+    private options: FormattingOptions | null = null;
 
 
     public setTitle(title: string) {
@@ -18,7 +18,7 @@ export class PageBuilder {
         return this;
     }
 
-    public setOptions(options: FormatingOptions) {
+    public setOptions(options: FormattingOptions) {
         this.options = options;
         return this;
     }
@@ -30,9 +30,9 @@ export class PageBuilder {
 
     public build() {
         if (
-            this.items        === null ||
-            this.title        === null ||
-            this.options      === null
+            this.items   === null ||
+            this.title   === null ||
+            this.options === null
         ) {
             throw new Error();
         }

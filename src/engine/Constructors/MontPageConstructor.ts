@@ -2,6 +2,7 @@ import { Item } from "../Item";
 import { Page } from "../Page";
 import { PageBuilder } from "../PageBuilder";
 import { Constructor } from "./Constructor";
+import { PageItemsEnum } from "@/types/page-items.enum";
 
 
 const MONTHS = [
@@ -19,13 +20,18 @@ const MONTHS = [
     "Дек.",
 ];
 
+const COLS_COUNT = 4;
+const ROWS_COUNT = 3;
+
 export class MonthPageConstructor implements Constructor{
     private year!: number; 
     private lastPage: Page | null = null;
+    private options = { filterable: false };
 
-    constructor(date?: Date) {        
+    constructor(date?: Date, options?: { filterable: boolean }) {        
         date = date || new Date();
         this.setDate(date);
+        this.options = options || this.options;
     }
 
     public getCurrentPage() {
@@ -35,10 +41,10 @@ export class MonthPageConstructor implements Constructor{
 
         const currentItems: Item[] = MONTHS.map((month, i) => {
             return new Item(
-                `${i+1}/${this.year}`, 
+                `${'_' + Math.random().toString(36).substr(2, 9)}`, 
                 month, 
                 new Date(this.year, i),
-                ['PRIMARY']
+                [PageItemsEnum.PRIMARY]
             );
         });
 
@@ -46,7 +52,7 @@ export class MonthPageConstructor implements Constructor{
             .setDate(new Date(this.year, 1))
             .setItems([...currentItems])
             .setTitle(`${this.year}`)
-            .setOptions({ rows: 3, cols: 4 })
+            .setOptions({ rows: ROWS_COUNT, cols: COLS_COUNT, ...this.options })
             .build();
         
         return this.lastPage;

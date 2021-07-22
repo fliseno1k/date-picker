@@ -1,13 +1,8 @@
 
-const DEFAULT_TYPE_INDEX = 0; 
-const RANGED_TYPE_INDEX = 1;
+import { PageItemsEnum } from "@/types/page-items.enum";
 
-export enum ItemTypes {
-    PRIMARY = 'primary',
-    SECONDARY = 'secondary',
-    RANGE_BOUND = 'rangeBound', 
-    RANGE_INNER = 'rangeInner',
-}
+
+const RANGED_TYPE_INDEX = 1;
 
 export class Item {
 
@@ -18,7 +13,7 @@ export class Item {
         public readonly types: string[] = [],
     ) {}
 
-    public setRangeType(type: string) {
+    public setRangeType(type: PageItemsEnum | ''): void {
         this.types[RANGED_TYPE_INDEX] = type;
     }
 }

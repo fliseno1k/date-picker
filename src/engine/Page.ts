@@ -1,18 +1,19 @@
 import { Item } from "./Item";
 
 
-export type FormatingOptions = {
+export type FormattingOptions = {
     rows: number, 
-    cols: number
+    cols: number,
+    filterable: boolean,
 }
 
 export class Page {
 
     constructor(
-        public date: Date,
-        public title: string,
-        public items: Item[],
-        private options: FormatingOptions,
+        public readonly date: Date,
+        public readonly title: string,
+        public readonly items: Item[],
+        public readonly options: FormattingOptions,
     ) {}
 
     public toRows() {

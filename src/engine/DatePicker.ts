@@ -2,55 +2,73 @@ import {
     Constructor, 
     DecadePageConstructor,
     MonthPageConstructor,
-    DaysPageContuctor,
+    DaysPageConstructor,
 } from "./Constructors";
 import { DateRange } from "./DateRange";
-import { Filter } from "./Filter";
+import { RangeFilter } from "./RangeFilter";
+import { Item } from "./Item";
+import { Page } from "./Page";
+import {TimePeriodsEnum} from "@/types/time-periods.enum";
 
-export enum cEnum {
-    DECADES = "decades", 
-    MONTHS = "months", 
-    DAYS = "days"
-}
 
 const constructorsFactory = {
-    [cEnum.DAYS]:    DaysPageContuctor,
-    [cEnum.MONTHS]:  MonthPageConstructor,
-    [cEnum.DECADES]: DecadePageConstructor, 
+    [TimePeriodsEnum.DAYS]:    DaysPageConstructor,
+    [TimePeriodsEnum.MONTHS]:  MonthPageConstructor,
+    [TimePeriodsEnum.DECADES]: DecadePageConstructor,
 };
 
 export class DatePicker {
     private pageConstructor: Constructor;
 
-    constructor(
-        private filter: Filter,
-        private dateRange: DateRange
-    ) {
-        this.pageConstructor = new constructorsFactory[cEnum.DAYS]();
+    constructor(private dateRange: DateRange) {
+        this.pageConstructor = new constructorsFactory[TimePeriodsEnum.DAYS]();
     }
 
     public getCurrentPage() {
-        return this.filter.filter(this.pageConstructor.getCurrentPage());
+        const page = this.pageConstructor.getCurrentPage();
+        return page.options.filterable
+            ? RangeFilter.filter(page, this.dateRange.orderedRange)
+            : page;
     }
     
     public getNextPage() {
-        return this.filter.filter(this.pageConstructor.getNextPage());
+        const page = this.pageConstructor.getNextPage();
+        return page.options.filterable
+            ? RangeFilter.filter(page, this.dateRange.orderedRange)
+            : page;
+
     }
 
     public getPreviousPage() {
-        return this.filter.filter(this.pageConstructor.getPreviousPage());
+        const page =  this.pageConstructor.getPreviousPage();
+        return page.options.filterable
+            ? RangeFilter.filter(page, this.dateRange.orderedRange)
+            : page;
+
     }
 
-    public setPageConstructor(type: cEnum.DECADES | cEnum.MONTHS | cEnum.DAYS) {
-        this.pageConstructor = new constructorsFactory[type]();
+    public setPageConstructor(type: TimePeriodsEnum, options?: { date: Date }) {
+        this.pageConstructor = new constructorsFactory[type](options?.date);
         return this;
     }
 
-    public setRangeBound(bound: Date) {
+    public pushRangeBound(bound: Item) {
         this.dateRange.pushBound(bound);
     }
 
     public clearRange() {
         this.dateRange.clearBounds();
     }
+
+    public isRangeFull() {
+        return this.dateRange.isFull;
+    }
+
+    public getRange() {
+        return this.dateRange.orderedRange;
+    }
+
+    public filterPage(page: Page) {
+        return RangeFilter.filter(page, this.dateRange.orderedRange);
+    } 
 }

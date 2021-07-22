@@ -1,55 +1,58 @@
+import { Item } from './Item';
 
-const MS_PER_DAY = 1000 * 60 * 60 * 24;
 
 type OrderedRange = {
-    leftBound: Date, 
-    rightBound: Date, 
-    rangeLength: number;
+    leftBound: Item, 
+    rightBound: Item, 
 }
 
 export class DateRange {
-    private bounds: Date[];
+    private bounds: Item[];
 
-    constructor(bounds?: Date[]) {
+    constructor(bounds?: Item[]) {
         this.bounds = bounds || [];
     }
 
-    private orderDates(a: Date, b: Date) {
-        const isGreater = a.getTime() > b.getTime();
+    private reorderBounds() {
+        if (this.bounds.length < 2) return;
+        this.bounds = this.bounds.sort((a: Item, b: Item) => {
+            if (a.date.getTime() < b.date.getTime()) return - 1; 
+            if (a.date.getTime() > b.date.getTime()) return 1;
 
-        if (isGreater) {
-            [a, b] = [b, a];
-        }
-
-        return [a, b];
+            return 0;
+        });
     }
 
-    private dateDiffInDays(a: Date, b: Date) {
-        const utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
-        const utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
-      
-        return Math.floor((utc2 - utc1) / MS_PER_DAY);
-    }
-
-    public pushBound(bound: Date) {
-        if (this.bounds.length === 2) {
-            const boundsTimes = [...this.bounds, bound].map(bound => bound.getTime());
-            this.bounds = [Math.max(...boundsTimes)].map(bound => new Date(bound));
-        } else {
+    public pushBound(bound: Item) {
+        if (!this.isFull) {
             this.bounds.push(bound);
+        } else {
+            this.clearBounds();
+            this.pushBound(bound);
         }
+
+        this.reorderBounds();
     }
 
     public clearBounds() {
         this.bounds = [];
     }
 
+    get isFull() {
+        return this.bounds.length === 2;
+    }
+
     get orderedRange() {
-        const [leftBound, rightBound] = this.orderDates(this.bounds[0], this.bounds[1]);
+        if (!this.isFull && this.bounds.length === 1) {
+            return {
+                leftBound: this.bounds[0],
+                rightBound: this.bounds[0],
+            }
+        }
+
         return {
-            leftBound, 
-            rightBound, 
-            length: this.dateDiffInDays(leftBound, rightBound),
+            leftBound: this.bounds[0],
+            rightBound: this.bounds[1]
         }
     }
 }
