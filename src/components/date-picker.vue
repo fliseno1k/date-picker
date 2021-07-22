@@ -27,10 +27,13 @@
                     </thead>
                     <tbody>
                         <tr v-bind:key="i" v-for="(row, i) in rowedPage">
-                            <component :is="currentPeriod"
+                            <component :is="currentItem"
                                 v-bind:key="item.id" 
                                 v-for="item in row"
                                 :item="item"
+                                :engine="this.engine"
+                                @constructorSet="this.onConstructorSet"
+                                @rangeSelect="this.onRangeSelect"
                             ></component>
                         </tr>
                     </tbody>
@@ -51,16 +54,17 @@ import initEngine from '../engine/';
 
 
 const timePeriodToComponent = {
-  [TimePeriodsEnum.DECADES]: 'decade-item',
-  [TimePeriodsEnum.MONTHS]: 'month-item',
-  [TimePeriodsEnum.DAYS]: 'day-item'
+    [TimePeriodsEnum.DECADES]: 'decade-item',
+    [TimePeriodsEnum.MONTHS]: 'month-item',
+    [TimePeriodsEnum.DAYS]: 'day-item'
 };
-
 
 @Options({
     components: {
         SlideControl,
-        DecadeItem
+        DecadeItem,
+        DayItem, 
+        MonthItem
     }
 })
 export default class DatePicker extends Vue {
@@ -85,9 +89,24 @@ export default class DatePicker extends Vue {
         if (this.currentPeriod >= 1) {
             this.currentPeriod--;
             this.page = this.engine
-                .setPageConstructor(TimePeriodsEnum[this.currentPeriod], { date: this.page.date })
+                .setPageConstructor(this.currentPeriod, { date: this.page.date })
                 .getCurrentPage();
         }
+    }
+
+    onConstructorSet({ period, date }) {
+        this.currentPeriod = period;
+        this.page = this.engine
+            .setPageConstructor(this.currentPeriod, { date })
+            .getCurrentPage();
+    }
+
+    onRangeSelect() {
+        window.dispatchEvent(new CustomEvent('rangeSelect', { 
+            detail: { 
+                range: this.engine.getRange 
+            }
+        }));
     }
 
     get isTableHeadVisible() {
