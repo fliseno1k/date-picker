@@ -8,7 +8,7 @@
                     </svg>
                 </slide-control>
                 <div class="date-picker__title">
-                    <span @click="stepBack"  >{{ title }}</span>
+                    <span @click="stepBack">{{ title }}</span>
                 </div>
                 <slide-control @slide="rightSlide">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -18,8 +18,22 @@
             </div>
             <div class="date-picker__body">
                 <table class="date-picker__table">
-                    <table-head :values="tHeadValues" />
-                    <table-body :rows="rowedPage" />
+                    <thead v-if="isTableHeadVisible">
+                        <tr>
+                            <td :key="i" v-for="(value, i) in tableHeadValues">
+                                {{ value }}
+                            </td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-bind:key="i" v-for="(row, i) in rowedPage">
+                            <component :is="currentPeriod"
+                                v-bind:key="item.id" 
+                                v-for="item in row"
+                                :item="item"
+                            ></component>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -28,33 +42,35 @@
 
 <script>
 import { Options, Vue } from 'vue-class-component';
+import { TimePeriodsEnum } from "@/types/time-periods.enum";
 import SlideControl from './slide-control.vue';
-import TableHead from './table-head.vue';
-import TableBody from './table-body.vue';
+import DecadeItem from './decade-item.vue';
+import DayItem from './day-item.vue';
+import MonthItem from './month-item.vue';
+import initEngine from '../engine/';
 
-import initEngine, { cEnum } from '../engine/';
 
-const cArray = [cEnum.DECADES, cEnum.MONTHS, cEnum.DAYS];
+const timePeriodToComponent = {
+  [TimePeriodsEnum.DECADES]: 'decade-item',
+  [TimePeriodsEnum.MONTHS]: 'month-item',
+  [TimePeriodsEnum.DAYS]: 'day-item'
+};
+
 
 @Options({
     components: {
         SlideControl,
-        TableHead, 
-        TableBody
+        DecadeItem
     }
 })
 export default class DatePicker extends Vue {
-    currentPageType = 2;
-    tHeadValues = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
+    currentPeriod = TimePeriodsEnum.DAYS;
+    tableHeadValues = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
     engine = initEngine();
     page = null;
 
     created() {
         this.page = this.engine.getCurrentPage();
-    }
-
-    updated() {
-        console.log(this.isTHeadVisible);
     }
 
     leftSlide() {
@@ -66,15 +82,16 @@ export default class DatePicker extends Vue {
     }
 
     stepBack() {
-        if (this.currentPageType >= 1) {
-            this.currentPageType--;
-            this.engine.setPageConstructor(cArray[this.currentPageType]);
-            this.page = this.engine.getCurrentPage();
+        if (this.currentPeriod >= 1) {
+            this.currentPeriod--;
+            this.page = this.engine
+                .setPageConstructor(TimePeriodsEnum[this.currentPeriod], { date: this.page.date })
+                .getCurrentPage();
         }
     }
 
-    get isTHeadVisible() {
-        return this.currentPageType === 2;
+    get isTableHeadVisible() {
+        return this.currentPeriod === TimePeriodsEnum.DAYS;
     }
 
     get rowedPage() {
@@ -82,7 +99,11 @@ export default class DatePicker extends Vue {
     }
 
     get title() {
-        return this.page.pageTitle;
+        return this.page.title;
+    }
+
+    get currentItem() {
+      return timePeriodToComponent[this.currentPeriod];
     }
 }
 </script>
@@ -124,6 +145,7 @@ export default class DatePicker extends Vue {
 
 .date-picker__title span:hover {
     color: #fc5808;
+    text-decoration: underline;
     transition: .3s ease-in-out;
 }
 
@@ -142,11 +164,4 @@ export default class DatePicker extends Vue {
     font-size: 13px;
     color: #8c8c8c;
 }
-
-.date-picker__table tbody td {
-    font-size: 16px; 
-    line-height: 32px;
-    color: #333;
-}
-
 </style>
