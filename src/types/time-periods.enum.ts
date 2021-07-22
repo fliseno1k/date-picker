@@ -1,8 +1,8 @@
 
 export enum TimePeriodsEnum {
-	DECADES = "decades",
-	MONTHS = "months",
-	DAYS = "days"
+	DECADES,
+	MONTHS,
+	DAYS,
 }
 
 
