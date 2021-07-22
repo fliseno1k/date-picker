@@ -1,16 +1,24 @@
 <template> 
-    <td class="date-picker__table-item"  @click="onItemSelect" :class="classes">{{ item.value }}</td>
+    <td 
+        @click="onItemSelect"
+        class="date-picker__table-item" 
+        :class="classes"
+    >{{ item.value }}</td>
 </template>
 
 <script>
 import { Options, Vue } from 'vue-class-component';
 import { Prop } from 'vue-property-decorator';
+import { TimePeriodsEnum } from '../types/time-periods.enum';
 
 
 Options({})
 export default class DecadeItem extends Vue {
     @Prop({ default: '' })
     item
+
+    @Prop({ default: '' })
+    engine
 
     get classes() {
         return this.item.types
@@ -20,9 +28,10 @@ export default class DecadeItem extends Vue {
     }
 
     onItemSelect() {
-      console.log('select');
-        // this.engine.pushRangeBound(this.item);
-        // this.engine.filterPage(this.page);
+        this.$emit('constructorSet', {
+            period: TimePeriodsEnum.MONTHS, 
+            date: this.item.date
+        });      
     }
 
 }

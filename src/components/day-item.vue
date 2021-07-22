@@ -9,13 +9,14 @@
 <script>
 import { Options, Vue } from 'vue-class-component';
 import { Prop } from 'vue-property-decorator';
-import { TimePeriodsEnum } from "@/types/time-periods.enum";
-
 
 Options({})
 export default class DayItem extends Vue {
     @Prop({ default: '' })
     item
+
+    @Prop({ default: '' })
+    engine
 
     get classes() {
         return this.item.types
@@ -25,12 +26,12 @@ export default class DayItem extends Vue {
     }
 
     onItemSelect() {
-        console.log('select');
-        // this.page = this.engine
-        //     .setPageConstructor(TimePeriodsEnum.DAYS, { date: this.item.date })
-        //     .getCurrentPage();
-        //
-        // this.currentPageType = 2;
+        this.engine.pushRangeBound(this.item);
+        this.engine.filterPage(this.engine.getCurrentPage());
+
+        if (this.engine.isRangeFull()) {
+            this.$emit('rangeSelect', { range: this.engine.getRange() })
+        }
     }
 
 }
@@ -51,7 +52,7 @@ export default class DayItem extends Vue {
     border-radius: 4px;
 }
 
-.date-picker__table-item_inside_range {
+.date-picker__table-item_range_child {
     border-radius: 0;
     background: #ffe7ce;
 }

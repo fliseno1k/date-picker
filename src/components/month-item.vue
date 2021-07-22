@@ -25,12 +25,10 @@ export default class MonthItem extends Vue {
     }
 
     onItemSelect() {
-        console.log('select');
-        // this.page = this.engine
-        //     .setPageConstructor(TimePeriodsEnum.DAYS, { date: this.item.date })
-        //     .getCurrentPage();
-        //
-        // this.currentPageType = 2;
+        this.$emit('constructorSet', {
+            period: TimePeriodsEnum.DAYS, 
+            date: this.item.date
+        });
     }
 
 }
