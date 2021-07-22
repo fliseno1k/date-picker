@@ -14,6 +14,7 @@ export class Item {
     constructor(
         public readonly id: string, 
         public readonly value: number | string, 
+        public readonly date: Date,
         public readonly types: string[] = [],
     ) {}
 
