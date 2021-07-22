@@ -1,30 +1,20 @@
-import { PagePart, Page, FormatingOptions } from "./Page";
+import { Page, FormatingOptions } from "./Page";
 import { Item } from './Item';
 
 export class PageBuilder {
+    private date: Date | null = null;
     private title: string | null = null; 
-    private currentPart: PagePart | null = null; 
-    private previousPart: PagePart | null = null; 
-    private nextPart: PagePart | null = null;
+    private items: Item[] | null = null;
     private options: FormatingOptions | null = null;
+
 
     public setTitle(title: string) {
         this.title = title;
         return this;
     }
 
-    public setCurrent(date: Date, items: Item[]) {
-        this.currentPart = { date, items };
-        return this;
-    }
-
-    public setPrevious(date: Date, items: Item[]) {
-        this.previousPart = { date, items };
-        return this;
-    }
-
-    public setNext(date: Date, items: Item[]) {
-        this.nextPart = { date, items };
+    public setItems(items: Item[]) {
+        this.items = items;
         return this;
     }
 
@@ -33,11 +23,14 @@ export class PageBuilder {
         return this;
     }
 
+    public setDate(date: Date) {
+        this.date = date;
+        return this;
+    }
+
     public build() {
         if (
-            this.previousPart === null || 
-            this.currentPart  === null || 
-            this.nextPart     === null || 
+            this.items        === null ||
             this.title        === null ||
             this.options      === null
         ) {
@@ -45,10 +38,9 @@ export class PageBuilder {
         }
 
         return new Page(
+            this.date as Date,
             this.title,
-            this.currentPart  as PagePart, 
-            this.previousPart as PagePart, 
-            this.nextPart     as PagePart,
+            this.items,
             this.options
         );
     }

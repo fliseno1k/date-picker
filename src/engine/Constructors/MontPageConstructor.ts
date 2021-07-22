@@ -20,29 +20,31 @@ const MONTHS = [
 ];
 
 export class MonthPageConstructor implements Constructor{
-    private month: number; 
-    private year: number; 
+    private year!: number; 
     private lastPage: Page | null = null;
 
     constructor(date?: Date) {        
-        date       = date || new Date();
-        this.year  = date.getFullYear();
-        this.month = date.getMonth();
+        date = date || new Date();
+        this.setDate(date);
     }
 
     public getCurrentPage() {
-        if (this.lastPage && this.lastPage.year === this.year) {
+        if (this.lastPage && this.lastPage.date.getFullYear() === this.year) {
             return this.lastPage;
         }
 
         const currentItems: Item[] = MONTHS.map((month, i) => {
-            return new Item(`${i+1}/${this.year}`, month);
+            return new Item(
+                `${i+1}/${this.year}`, 
+                month, 
+                new Date(this.year, i),
+                ['PRIMARY']
+            );
         });
 
         this.lastPage = new PageBuilder()
-            .setPrevious(new Date(this.year - 1, this.month), [])
-            .setCurrent(new Date(this.year, this.month), currentItems)
-            .setNext(new Date(this.year + 1, this.month), [])
+            .setDate(new Date(this.year, 1))
+            .setItems([...currentItems])
             .setTitle(`${this.year}`)
             .setOptions({ rows: 3, cols: 4 })
             .build();
@@ -52,23 +54,20 @@ export class MonthPageConstructor implements Constructor{
 
 
     public getPreviousPage() {
-        const date = new Date(this.year - 1, this.month);
+        const date = new Date(this.year - 1, 1);
         this.year = date.getFullYear();
-        this.month = date.getMonth();
 
         return this.getCurrentPage();
     }
 
     public getNextPage() {
-        const date = new Date(this.year + 1, this.month);
+        const date = new Date(this.year + 1, 1);
         this.year = date.getFullYear();
-        this.month = date.getMonth();
 
         return this.getCurrentPage();
     }
 
     public setDate(date: Date) {
         this.year = date.getFullYear();
-        this.month = date.getMonth();
     }
 }

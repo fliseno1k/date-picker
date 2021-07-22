@@ -4,7 +4,7 @@ import { PageBuilder } from "../PageBuilder";
 import { Constructor } from "./Constructor";
 
 const months = [
-    'Янарь',
+    'Январь',
     'Февраль',
     'Март',
     'Апрель',
@@ -23,14 +23,13 @@ const DAYS_IN_WEEK     = 7;
 const DAYS_IN_ONE_PAGE = WEEKS_COUNT * DAYS_IN_WEEK;
 
 export class DaysPageContuctor implements Constructor {
-    private year: number;
-    private month: number;
+    private year!: number;
+    private month!: number;
     private lastPage: Page | null = null;
 
     constructor(date?: Date) {
-        date       = date || new Date();
-        this.year  = date.getFullYear();
-        this.month = date.getMonth();
+        date = date || new Date();
+        this.setDate(date);
     }
 
     private getMonthLength(year: number, month: number) {
@@ -38,7 +37,7 @@ export class DaysPageContuctor implements Constructor {
     }
 
     public getCurrentPage() {
-        if (this.lastPage && this.lastPage.month === this.month) {
+        if (this.lastPage && this.lastPage.date.getMonth() === this.month) {
             return this.lastPage;
         }
 
@@ -54,24 +53,44 @@ export class DaysPageContuctor implements Constructor {
         //  Если первое число месяца выпадает на воскресенье, заполнить строку последними длянми предудущего месяца
         if (firstDay === 0) {
             for (let i = DAYS_IN_WEEK - 2; i >= 0; i--) {
-                previousDays.push(new Item(`${previousMonthLength - i}/${previousMonth}`, previousMonthLength - i))
+                previousDays.push( new Item(
+                    `${previousMonthLength - i}/${previousMonth}`, 
+                    previousMonthLength - i, 
+                    new Date(previousMonthYear, previousMonth, previousMonthLength),
+                    ['SECONDARY']
+                ));
             }
         //  Если первое число месяца выпадает на понедельник, включить добавочную неделю в начало массива
         } else if (firstDay === 1) {
             for (let i = DAYS_IN_WEEK - 1; i >= 0; i--) {
-                previousDays.push(new Item(`${previousMonthLength - i}/${previousMonth}`, previousMonthLength - i));
+                previousDays.push( new Item(
+                    `${previousMonthLength - i}/${previousMonth}`, 
+                    previousMonthLength - i, 
+                    new Date(previousMonthYear, previousMonth, previousMonthLength),
+                    ['SECONDARY']
+                ));            
             }
         //  Если первое число месяца наступает посреди недели, то заполнить строку последними днями предыдущего месяца
         } else {
             for (let i = firstDay - 2; i >= 0; i--) {
-                previousDays.push(new Item(`${previousMonthLength - i}/${previousMonth}`, previousMonthLength - i));
+                previousDays.push( new Item(
+                    `${previousMonthLength - i}/${previousMonth}`, 
+                    previousMonthLength - i, 
+                    new Date(previousMonthYear, previousMonth, previousMonthLength),
+                    ['SECONDARY']
+                ));            
             }
         }
 
         // Заполнение массива днями текущего месяца 
         const currentDays = [];
         for (let i = 1; i <= currentMonthLength; i++) {
-            currentDays.push(new Item(`${i}/${this.month}`, i));
+            currentDays.push( new Item(
+                `${i}/${this.month}`, 
+                i,
+                new Date(this.year, this.month, i),
+                ['PRIMARY']
+            ));
         }
 
         const nextMonthDate = new Date(this.year, this.month + 1, 1);
@@ -82,15 +101,19 @@ export class DaysPageContuctor implements Constructor {
         // Заполнение массива днями следующего месяца 
         const availableLength = DAYS_IN_ONE_PAGE - (currentDays.length + previousDays.length);
         for (let i = 1; i <= availableLength; i++) {
-            nextDays.push(new Item(`${i}/${nextMonth}`, i));
+            nextDays.push( new Item(
+                `${i}/${nextMonth}`, 
+                i,
+                new Date(nextMonthYear, nextMonthYear, i),
+                ['SECONDARY']
+            ));
         }
 
         this.lastPage = new PageBuilder()
-            .setNext(new Date(nextMonthYear, nextMonth), nextDays)
+            .setDate(new Date(this.year, this.month))
             .setTitle(`${months[this.month]} ${this.year}`)
-            .setCurrent(new Date(this.year, this.month), currentDays)
+            .setItems([...previousDays, ...currentDays, ...nextDays])
             .setOptions({ rows: WEEKS_COUNT, cols: DAYS_IN_WEEK })
-            .setPrevious(new Date(previousMonthYear, previousMonth), previousDays)
             .build();
 
         return this.lastPage;
