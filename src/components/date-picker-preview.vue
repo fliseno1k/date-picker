@@ -1,17 +1,22 @@
 <template>
-    <div class="range-picker">
-        <div class="range-picker__container">
-            <div class="range-picker__date-picker-caller">
-                <button @click="onButtonClick">
+    <div class="date-picker-preview">
+        <div class="date-picker-preview__container">
+            <button @click.stop="onButtonClick" class="date-picker-preview__toggle">
+                <span>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                </span>
+            </button>
+            <div v-if="isTitleVisible" class="date-picker-preview__title">
+                <span class="date-picker-preview__text">{{ title }}</span>
+                <button @click="onClearRange" class="date-picker-preview__clear-button" >
                     <span>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
                         </svg>
                     </span>
-                </button>    
-            </div>
-            <div class="range-picker__title">
-                <span class="range-picker__text">27/12/2021 - 31/01/2022</span>
+                </button>
             </div>
         </div>
     </div>
@@ -19,32 +24,56 @@
 
 <script>
 import { Options, Vue } from 'vue-class-component';
+import { Prop } from 'vue-property-decorator';
 
 @Options({})
 export default class Button extends Vue {
+    @Prop({ default: ''})
+    range;
 
     onButtonClick() {
         this.$emit('togglePicker');
+    }
+
+    yyyymmdd(date) {
+        const mm = date.getMonth() + 1; // getMonth() is zero-based
+        const dd = date.getDate();
+
+        return [
+            (dd>9 ? '' : '0') + dd,
+            (mm>9 ? '' : '0') + mm,
+            date.getFullYear(),
+        ].join('/');
+    }
+
+    onClearRange() {
+        this.$emit('clearRange');
+    }
+
+    get title() {
+        if (!this.range.leftBound || !this.range.rightBound) return '';
+        if (this.range.leftBound.date.getTime() === this.range.rightBound.date.getTime()) return this.yyyymmdd(this.range.leftBound.date);
+        return this.yyyymmdd(this.range.leftBound.date) + ' - ' + this.yyyymmdd(this.range.rightBound.date) || '';
+    }
+
+    get isTitleVisible() {
+        return this.range.leftBound;
     }
 
 }
 </script>
 
 <style>
-    .range-picker {
+    .date-picker-preview {
         position: relative;
     }
 
-    .range-picker__container {
+    .date-picker-preview__container {
         display: flex;
         justify-content: center;
     }
 
-    .range-picker__date-picker-caller {
-        flex: none;
-    }
-
-    .range-picker__date-picker-caller button {
+    .date-picker-preview__toggle {
         display: flex;
         align-items: center;
         padding: 8px;
@@ -56,15 +85,16 @@ export default class Button extends Vue {
         margin-right: 12px;
     }
 
-    .range-picker__date-picker-caller button span {
+    .date-picker-preview__toggle span {
         display: inline-block;
         width: 24px;
         height: 24px;
         color: #8c8c8c;
     }
 
-    .range-picker__title {
+    .date-picker-preview__title {
         display: flex;
+        flex-direction: row;
         align-items: center;
         padding: 8px 12px;
         border-radius: 8px;
@@ -72,9 +102,31 @@ export default class Button extends Vue {
         border: 1px solid #8c8c8c;
     }
 
-    .range-picker__text {
+    .date-picker-preview__text {
         font-size: 18px;
         font-weight: 500;
+        color: #8c8c8c;
+    }
+
+    .date-picker-preview__clear-button {
+        display: flex;
+        pdding: 4px;
+        margin-left: 10px;
+        border-radius: 2px;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+    }
+
+    .date-picker-preview__clear-button:hover {
+        background: #f8f8f8;
+
+    }
+
+    .date-picker-preview__clear-button span {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
         color: #8c8c8c;
     }
 
