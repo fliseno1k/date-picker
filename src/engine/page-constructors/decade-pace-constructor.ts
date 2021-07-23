@@ -1,6 +1,6 @@
-import { Item } from "../Item";
-import { Page } from "../Page";
-import { PageBuilder } from "../PageBuilder";
+import { Item } from "../item";
+import { Page } from "../page";
+import { PageBuilder } from "../page-builder";
 import { Constructor } from "./constructor";
 import { PageItemsEnum } from "@/types/page-items.enum";
 
@@ -8,7 +8,7 @@ import { PageItemsEnum } from "@/types/page-items.enum";
 const COLS_COUNT = 4;
 const ROWS_COUNT = 3;
 
-export class DecadePageConstructor implements Constructor {
+export class DecadePaceConstructor implements Constructor {
     private year!: number;
     private lastPage: Page | null = null;
     private options = { filterable: false };

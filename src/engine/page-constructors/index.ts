@@ -1,11 +1,11 @@
-import { DaysPageConstructor } from "./DaysPageConstructor";
-import { MonthPageConstructor } from "./MontPageConstructor";
-import { DecadePageConstructor } from "./DecadePageConstructor";
-import { Constructor } from "./Constructor";
+import { DaysPageConstructor } from "./days-page-constructor";
+import { MonthPageConstructor } from "./mont-page-constructor";
+import { DecadePaceConstructor } from "./decade-pace-constructor";
+import { Constructor } from "./constructor";
 
 export {
     DaysPageConstructor,
     MonthPageConstructor,
-    DecadePageConstructor, 
+    DecadePaceConstructor,
     Constructor,
 };

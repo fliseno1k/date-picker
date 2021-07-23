@@ -1,7 +1,7 @@
-import { Item } from "../Item";
-import { Page } from "../Page";
-import { PageBuilder } from "../PageBuilder";
-import { Constructor } from "./Constructor";
+import { Item } from "../item";
+import { Page } from "../page";
+import { PageBuilder } from "../page-builder";
+import { Constructor } from "./constructor";
 import { PageItemsEnum } from "@/types/page-items.enum";
 
 const months = [
