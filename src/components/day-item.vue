@@ -1,7 +1,7 @@
 <template> 
     <td
         @click="onItemSelect"
-        class="date-picker__table-item"
+        class="date-picker-calendar__table-item"
         :class="classes"
     >{{ item.value }}</td>
 </template>
@@ -21,43 +21,46 @@ export default class DayItem extends Vue {
     get classes() {
         return this.item.types
             .filter(type => type.length > 0)
-            .map(type => 'date-picker__table-item_' + type)
+            .map(type => 'date-picker-calendar__table-item_' + type)
             .join(' ');
     }
 
     onItemSelect() {
-        this.engine.pushRangeBound(this.item);
-        this.engine.filterPage(this.engine.getCurrentPage());
+        this.$emit('selectBound', { bound: this.item });
 
-        if (this.engine.isRangeFull()) {
-            this.$emit('rangeSelect', { range: this.engine.getRange() })
-        }
+        // if (this.engine.isRangeFull()) {
+        //     window.dispatchEvent(new CustomEvent('rangeSelect', {
+        //         detail: {
+        //             range: this.engine.getRange(),
+        //         }
+        //     }));
+        // }
     }
 
 }
 </script>
 
 <style>
-.date-picker__table-item_primary {
+.date-picker-calendar__table-item_primary {
     color: #333;
 }
 
-.date-picker__table-item_secondary {
+.date-picker-calendar__table-item_secondary {
     color: #8c8c8c;
 }
 
-.date-picker__table-item_range_bound {
+.date-picker-calendar__table-item_range_bound {
     background: #fc8507;
     color: #fff;
     border-radius: 4px;
 }
 
-.date-picker__table-item_range_child {
+.date-picker-calendar__table-item_range_child {
     border-radius: 0;
     background: #ffe7ce;
 }
 
-.date-picker__table-item {
+.date-picker-calendar__table-item {
     font-size: 16px; 
     line-height: 32px;
     cursor: pointer;

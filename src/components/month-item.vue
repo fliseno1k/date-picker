@@ -1,6 +1,6 @@
 <template> 
     <td
-        @click="onItemSelect"
+        @click.stop="onItemSelect"
         class="date-picker__table-item"
         :class="classes"
     >{{ item.value }}</td>
@@ -17,6 +17,9 @@ export default class MonthItem extends Vue {
     @Prop({ default: '' })
     item
 
+    @Prop({ default: '' })
+    engine
+
     get classes() {
         return this.item.types
             .filter(type => type.length > 0)
@@ -25,10 +28,8 @@ export default class MonthItem extends Vue {
     }
 
     onItemSelect() {
-        this.$emit('constructorSet', {
-            period: TimePeriodsEnum.DAYS, 
-            date: this.item.date
-        });
+        this.engine.setPageConstructor(TimePeriodsEnum.DAYS, { date: this.item.date });
+        this.$emit('updatePage');
     }
 
 }
