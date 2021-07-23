@@ -1,4 +1,4 @@
-import { Page, FormattingOptions } from "./Page";
+import { Page, FormattingOptions } from "./page";
 import { Item } from './item';
 
 export class PageBuilder {
