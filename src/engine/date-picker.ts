@@ -1,9 +1,10 @@
 import {Constructor, DaysPageConstructor, DecadePaceConstructor, MonthPageConstructor,} from "./page-constructors";
-import {DateRange} from "./DateRange";
-import {RangeFilter} from "./RangeFilter";
-import {Item} from "./Item";
-import {Page} from "./Page";
+import {DateRange} from "./date-range";
+import {RangeFilter} from "./range-filter";
+import {Item} from "./item";
+import {Page} from "./page";
 import {TimePeriodsEnum} from "@/types/time-periods.enum";
+import {OrderedRange} from "@/types/range.type";
 
 
 const constructorsFactory = {
@@ -16,8 +17,8 @@ export class DatePicker {
     private pageConstructor: Constructor;
     private currentConstructor: TimePeriodsEnum;
 
-    constructor(private dateRange: DateRange) {
-        this.pageConstructor = new constructorsFactory[TimePeriodsEnum.DAYS]();
+    constructor(private dateRange: DateRange, options?: { date: Date }) {
+        this.pageConstructor = new constructorsFactory[TimePeriodsEnum.DAYS](options?.date);
         this.currentConstructor = TimePeriodsEnum.DAYS;
 
     }
@@ -61,6 +62,10 @@ export class DatePicker {
 
     public isRangeFull() {
         return this.dateRange.isFull;
+    }
+
+    public setRange(range: OrderedRange) {
+        this.dateRange.range = range;
     }
 
     public getRange() {
