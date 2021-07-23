@@ -1,13 +1,16 @@
 <template>
-    <div class="date-picker">
-        <div class="date-picker__container">
-            <div class="date-picker__header">
+    <div
+        class="date-picker-calendar"
+        v-click-outside="onOutsideClick"
+    >
+        <div class="date-picker-calendar__container">
+            <div class="date-picker-calendar__header">
                 <slide-control @slide="leftSlide">
                     <svg xmlns="http://www.w3.org/2000/svg" class="date-picker__control-icon" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
                     </svg>
                 </slide-control>
-                <div class="date-picker__title">
+                <div class="date-picker-calendar__title">
                     <span @click="stepBack">{{ title }}</span>
                 </div>
                 <slide-control @slide="rightSlide">
@@ -16,8 +19,8 @@
                     </svg>
                 </slide-control>
             </div>
-            <div class="date-picker__body">
-                <table class="date-picker__table">
+            <div class="date-picker-calendar__body">
+                <table class="date-picker-calendar__table">
                     <thead v-if="isTableHeadVisible">
                         <tr>
                             <td :key="i" v-for="(value, i) in tableHeadValues">
@@ -32,7 +35,8 @@
                                 v-for="item in row"
                                 :item="item"
                                 :engine="this.engine"
-                                @update="this.onUpdate"
+                                @updatePage="this.onPageUpdate"
+                                @selectBound="this.onBoundSelect"
                             ></component>
                         </tr>
                     </tbody>
@@ -44,6 +48,7 @@
 
 <script>
 import { Options, Vue } from 'vue-class-component';
+import { Prop, Watch } from 'vue-property-decorator';
 import { TimePeriodsEnum } from "@/types/time-periods.enum";
 import SlideControl from './slide-control.vue';
 import DecadeItem from './decade-item.vue';
@@ -64,15 +69,44 @@ const timePeriodToComponent = {
         DecadeItem,
         DayItem, 
         MonthItem
+    },
+
+    directives: {
+        clickOutside: {
+            beforeMount: (el, binding) => {
+                el.clickOutsideEvent = (e) => {
+                    if (!(el === e.target || el.contains(e.target))) {
+                        binding.value();
+                    }
+                }
+                document.addEventListener('click', el.clickOutsideEvent);
+            },
+            unmounted: el => {
+                document.removeEventListener('click', el.clickOutsideEvent);
+            }
+        }
     }
 })
 export default class DatePicker extends Vue {
+    @Prop({ default: { leftBound: null, rightBound: null}})
+    range;
+
+    @Watch('range')
+    onRangeChange() {
+        this.engine.setRange(this.range);
+        this.page = this.engine.getCurrentPage();
+    }
+
     currentPeriod = TimePeriodsEnum.DAYS;
     tableHeadValues = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
-    engine = initEngine();
     page = null;
+    engine = null;
 
     created() {
+        this.engine = this.range.leftBound
+            ? initEngine({ date: this.range.leftBound.date })
+            : initEngine();
+        this.engine.setRange(this.range);
         this.page = this.engine.getCurrentPage();
     }
 
@@ -93,9 +127,17 @@ export default class DatePicker extends Vue {
         }
     }
 
-    onUpdate() {
+    onPageUpdate() {
         this.currentPeriod = this.engine.getCurrentConstructor();
         this.page = this.engine.getCurrentPage();
+    }
+
+    onBoundSelect({ bound }) {
+        this.$emit('rangeUpdate', bound);
+    }
+
+    onOutsideClick() {
+        this.$emit('outsideClick');
     }
 
     get isTableHeadVisible() {
@@ -118,7 +160,7 @@ export default class DatePicker extends Vue {
 
 <style>
 
-.date-picker {
+.date-picker-calendar {
     display: block;
     width: 300px;
     padding: 16px;
@@ -128,21 +170,21 @@ export default class DatePicker extends Vue {
     font-size: 16px;
 }
 
-.date-picker__container {}
+.date-picker-calendar__container {}
 
-.date-picker__header {
+.date-picker-calendar__header {
     display: flex;
     flex-direction: row;
     line-height: 32px;
     color: #333;
 }
 
-.date-picker__title {
+.date-picker-calendar__title {
     flex-grow: 1;
     text-align: center;
 }
 
-.date-picker__title span {
+.date-picker-calendar__title span {
     font-size: 18px;
     font-weight: 600;
     color: #333;
@@ -151,20 +193,20 @@ export default class DatePicker extends Vue {
     cursor: pointer;
 }
 
-.date-picker__title span:hover {
+.date-picker-calendar__title span:hover {
     color: #fc5808;
     text-decoration: underline;
     transition: .3s ease-in-out;
 }
 
-.date-picker__body {
+.date-picker-calendar__body {
     display: flex;
     position: relative;
     padding-top: 14px;
     overflow: hidden;
 }
 
-.date-picker__table {
+.date-picker-calendar__table {
     width: 100%;
 }
 
