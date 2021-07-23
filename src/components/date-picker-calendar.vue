@@ -32,8 +32,7 @@
                                 v-for="item in row"
                                 :item="item"
                                 :engine="this.engine"
-                                @constructorSet="this.onConstructorSet"
-                                @rangeSelect="this.onRangeSelect"
+                                @update="this.onUpdate"
                             ></component>
                         </tr>
                     </tbody>
@@ -94,19 +93,9 @@ export default class DatePicker extends Vue {
         }
     }
 
-    onConstructorSet({ period, date }) {
-        this.currentPeriod = period;
-        this.page = this.engine
-            .setPageConstructor(this.currentPeriod, { date })
-            .getCurrentPage();
-    }
-
-    onRangeSelect() {
-        window.dispatchEvent(new CustomEvent('rangeSelect', { 
-            detail: { 
-                range: this.engine.getRange 
-            }
-        }));
+    onUpdate() {
+        this.currentPeriod = this.engine.getCurrentConstructor();
+        this.page = this.engine.getCurrentPage();
     }
 
     get isTableHeadVisible() {
