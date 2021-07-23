@@ -1,7 +1,7 @@
 <template>
-    <div class="date-picker-slide-control">
-        <button @click="$emit('slide')" class="date-picker-slide-control__button">
-            <span class="date-picker-slide-control__content-line">
+    <div class="date-picker-calendar-slide-control">
+        <button @click="$emit('slide')" class="date-picker-calendar-slide-control__button">
+            <span class="date-picker-calendar-slide-control__content-line">
                 <slot></slot>
             </span>
         </button>
@@ -16,11 +16,11 @@ export default class SlideControl extends Vue {}
 </script>
 
 <style>
-.date-picker-slide-control {
+.date-picker-calendar-slide-control {
     flex: none;
 }
 
-.date-picker-slide-control__button {
+.date-picker-calendar-slide-control__button {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -31,7 +31,7 @@ export default class SlideControl extends Vue {}
     cursor: pointer;
 }
 
-.date-picker-slide-control__content-line {
+.date-picker-calendar-slide-control__content-line {
     display: inline-block;
     width: 20px;
     height: 20px;
