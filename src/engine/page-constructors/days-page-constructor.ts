@@ -4,6 +4,8 @@ import { PageBuilder } from "../page-builder";
 import { Constructor } from "./constructor";
 import { PageItemsEnum } from "@/types/page-items.enum";
 
+
+/** Массив месяцев года по порядку */
 const months = [
     'Январь',
     'Февраль',
@@ -19,16 +21,30 @@ const months = [
     'Декабрь'
 ];
 
-const WEEKS_COUNT      = 6; 
+/** Количество недель, отображаемых на одной странице */
+const WEEKS_COUNT      = 6;
+
+/** Количество дней в неделе */
 const DAYS_IN_WEEK     = 7;
+
+/** Количество дней на одной странице */
 const DAYS_IN_ONE_PAGE = WEEKS_COUNT * DAYS_IN_WEEK;
 
+/**
+ * Конструктор страниц месяца
+ */
 export class DaysPageConstructor implements Constructor {
+    /** Год */
     private year!: number;
-    private month!: number;
-    private lastPage: Page | null = null;
-    private options = { filterable: true };
 
+    /** Месяц */
+    private month!: number;
+
+    /** Последняя посчитанная страница */
+    private lastPage: Page | null = null;
+
+    /** Опции */
+    private options = { filterable: true };
 
     constructor(date?: Date, options?: { filterable: boolean }) {
         date = date || new Date();
@@ -36,10 +52,16 @@ export class DaysPageConstructor implements Constructor {
         this.options = options || this.options;
     }
 
+    /**
+     * Получение количества дней в определенном месяце
+     */
     private getMonthLength(year: number, month: number) {
         return new Date(year, month + 1, 0).getDate();
     }
 
+    /**
+     * Получение сраницы для текущего месяца
+     */
     public getCurrentPage() {
         if (this.lastPage && this.lastPage.date.getMonth() === this.month) {
             return this.lastPage;
@@ -123,16 +145,25 @@ export class DaysPageConstructor implements Constructor {
         return this.lastPage;
     }
 
+    /**
+     * Получение страницы для следующего месяца
+     */
     public getNextPage() {
         this.setDate(new Date(this.year, this.month + 1));
         return this.getCurrentPage();
     }
 
+    /**
+     * Получение страницы для предыдущего месяца
+     */
     public getPreviousPage() {
         this.setDate(new Date(this.year, this.month - 1));
         return this.getCurrentPage();
     }
 
+    /**
+     * Установка текущей даты
+     */
     public setDate(date: Date) {
         this.year = date.getFullYear();
         this.month = date.getMonth();

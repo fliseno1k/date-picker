@@ -4,13 +4,23 @@ import { PageBuilder } from "../page-builder";
 import { Constructor } from "./constructor";
 import { PageItemsEnum } from "@/types/page-items.enum";
 
-
+/** Количество колонок */
 const COLS_COUNT = 4;
+
+/** Количество строк */
 const ROWS_COUNT = 3;
 
+/**
+ * Конструктор страниц года
+ */
 export class DecadePaceConstructor implements Constructor {
+    /** Год */
     private year!: number;
+
+    /** Последняя посчитанная страница */
     private lastPage: Page | null = null;
+
+    /** Опции */
     private options = { filterable: false };
 
     constructor(date?: Date, options?: { filterable: boolean }) {
@@ -19,6 +29,7 @@ export class DecadePaceConstructor implements Constructor {
         this.options = options || this.options;
     }
 
+    /** Получение страницы для текущей даты */
     public getCurrentPage() {
         if (this.lastPage && this.lastPage.date.getFullYear() === this.year) {
             return this.lastPage;
@@ -62,16 +73,25 @@ export class DecadePaceConstructor implements Constructor {
         return this.lastPage;
     }
 
+    /**
+     * Получение страницы для предыдущего года
+     */
     public getPreviousPage() {
         this.setDate(new Date(this.year - 10, 1));
         return this.getCurrentPage();
-    } 
+    }
 
+    /**
+     * Получение страницы для следующего года
+     */
     public getNextPage() {
         this.setDate(new Date(this.year + 10, 1));
         return this.getCurrentPage();
     }
 
+    /**
+     * Установка текущей даты
+     */
     public setDate(date: Date) {
         this.year = Math.floor(date.getFullYear() / 10) * 10; 
     }

@@ -1,5 +1,9 @@
 import { Page } from "../page";
 
+
+/**
+ * Интерфейс конструкторов страниц
+ */
 export interface Constructor {
     getCurrentPage(): Page; 
     getNextPage(): Page;
