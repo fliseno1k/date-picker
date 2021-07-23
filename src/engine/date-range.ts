@@ -1,5 +1,5 @@
-import { Item } from './Item';
-import { OrderedRange} from "@/types/range.type";
+import { Item } from './item';
+import {OrderedRange} from "@/types/range.type";
 
 export class DateRange {
     private bounds: Item[];
@@ -33,6 +33,13 @@ export class DateRange {
         this.bounds = [];
     }
 
+    set range(range: OrderedRange) {
+        const arr = [range.leftBound, range.rightBound];
+        arr
+            .filter((bound: Item) => bound !== null && bound !== undefined)
+            .forEach((bound: Item) => this.pushBound(bound));
+    }
+
     get isFull() {
         return this.bounds.length === 2;
     }
@@ -46,6 +53,11 @@ export class DateRange {
             return {
                 leftBound: this.bounds[0],
                 rightBound: this.bounds[0],
+            }
+        } else if (this.isEmpty) {
+            return {
+                leftBound: null,
+                rightBound: null
             }
         }
 
