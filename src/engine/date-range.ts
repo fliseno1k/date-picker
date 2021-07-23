@@ -1,10 +1,5 @@
 import { Item } from './Item';
-
-
-type OrderedRange = {
-    leftBound: Item, 
-    rightBound: Item, 
-}
+import { OrderedRange} from "@/types/range.type";
 
 export class DateRange {
     private bounds: Item[];
@@ -42,8 +37,12 @@ export class DateRange {
         return this.bounds.length === 2;
     }
 
+    get isEmpty() {
+        return this.bounds.length === 0;
+    }
+
     get orderedRange() {
-        if (!this.isFull && this.bounds.length === 1) {
+        if (!this.isFull && !this.isEmpty) {
             return {
                 leftBound: this.bounds[0],
                 rightBound: this.bounds[0],

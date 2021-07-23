@@ -1,27 +1,25 @@
-import { 
-    Constructor, 
-    DecadePageConstructor,
-    MonthPageConstructor,
-    DaysPageConstructor,
-} from "./Constructors";
-import { DateRange } from "./DateRange";
-import { RangeFilter } from "./RangeFilter";
-import { Item } from "./Item";
-import { Page } from "./Page";
+import {Constructor, DaysPageConstructor, DecadePaceConstructor, MonthPageConstructor,} from "./page-constructors";
+import {DateRange} from "./DateRange";
+import {RangeFilter} from "./RangeFilter";
+import {Item} from "./Item";
+import {Page} from "./Page";
 import {TimePeriodsEnum} from "@/types/time-periods.enum";
 
 
 const constructorsFactory = {
     [TimePeriodsEnum.DAYS]:    DaysPageConstructor,
     [TimePeriodsEnum.MONTHS]:  MonthPageConstructor,
-    [TimePeriodsEnum.DECADES]: DecadePageConstructor,
+    [TimePeriodsEnum.DECADES]: DecadePaceConstructor,
 };
 
 export class DatePicker {
     private pageConstructor: Constructor;
+    private currentConstructor: TimePeriodsEnum;
 
     constructor(private dateRange: DateRange) {
         this.pageConstructor = new constructorsFactory[TimePeriodsEnum.DAYS]();
+        this.currentConstructor = TimePeriodsEnum.DAYS;
+
     }
 
     public getCurrentPage() {
@@ -49,6 +47,7 @@ export class DatePicker {
 
     public setPageConstructor(type: TimePeriodsEnum, options?: { date: Date }) {
         this.pageConstructor = new constructorsFactory[type](options?.date);
+        this.currentConstructor = type;
         return this;
     }
 
@@ -70,5 +69,9 @@ export class DatePicker {
 
     public filterPage(page: Page) {
         return RangeFilter.filter(page, this.dateRange.orderedRange);
-    } 
+    }
+
+    public getCurrentConstructor() {
+        return this.currentConstructor;
+    }
 }

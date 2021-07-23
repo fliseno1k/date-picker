@@ -1,7 +1,7 @@
 import { Item } from "../Item";
 import { Page } from "../Page";
 import { PageBuilder } from "../PageBuilder";
-import { Constructor } from "./Constructor";
+import { Constructor } from "./constructor";
 import { PageItemsEnum } from "@/types/page-items.enum";
 
 

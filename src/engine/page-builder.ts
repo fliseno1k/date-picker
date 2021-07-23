@@ -1,5 +1,5 @@
 import { Page, FormattingOptions } from "./Page";
-import { Item } from './Item';
+import { Item } from './item';
 
 export class PageBuilder {
     private date: Date | null = null;

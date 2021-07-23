@@ -1,5 +1,5 @@
 import { Page } from "./Page";
-import { Item } from "./Item";
+import { Item } from "./item";
 import { PageItemsEnum } from "@/types/page-items.enum";
 
 
