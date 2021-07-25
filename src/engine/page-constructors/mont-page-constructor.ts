@@ -5,6 +5,7 @@ import { Constructor } from "./constructor";
 import { PageItemsEnum } from "@/types/page-items.enum";
 
 
+/** Массив сокращенных названий месяцев */
 const MONTHS = [
     "Янв.",
     "Февр.",
@@ -20,9 +21,17 @@ const MONTHS = [
     "Дек.",
 ];
 
+/** Количество колонок */
 const COLS_COUNT = 4;
+
+/** Количество строк */
 const ROWS_COUNT = 3;
 
+/**
+ * Конструктор страниц месяцев
+ * 
+ * @author Флис Алексей
+ */
 export class MonthPageConstructor implements Constructor{
     private year!: number; 
     private lastPage: Page | null = null;
@@ -58,7 +67,11 @@ export class MonthPageConstructor implements Constructor{
         return this.lastPage;
     }
 
-
+    /**
+     * Получение страницы для предыдущего года
+     * 
+     * @author Флис Алексей
+     */
     public getPreviousPage() {
         const date = new Date(this.year - 1, 1);
         this.year = date.getFullYear();
@@ -66,6 +79,11 @@ export class MonthPageConstructor implements Constructor{
         return this.getCurrentPage();
     }
 
+    /**
+     * Получение страницы для следующего года года
+     * 
+     * @author Флис Алексей
+     */
     public getNextPage() {
         const date = new Date(this.year + 1, 1);
         this.year = date.getFullYear();
@@ -73,6 +91,11 @@ export class MonthPageConstructor implements Constructor{
         return this.getCurrentPage();
     }
 
+    /**
+     * Установка текущей даты
+     * 
+     * @author Флис Алексей
+     */
     public setDate(date: Date) {
         this.year = date.getFullYear();
     }

@@ -31,7 +31,9 @@ const DAYS_IN_WEEK     = 7;
 const DAYS_IN_ONE_PAGE = WEEKS_COUNT * DAYS_IN_WEEK;
 
 /**
- * Конструктор страниц месяца
+ * Конструктор страниц дней
+ * 
+ * @author Флис Алексей
  */
 export class DaysPageConstructor implements Constructor {
     /** Год */
@@ -54,6 +56,8 @@ export class DaysPageConstructor implements Constructor {
 
     /**
      * Получение количества дней в определенном месяце
+     * 
+     * @author Флис Алексей
      */
     private getMonthLength(year: number, month: number) {
         return new Date(year, month + 1, 0).getDate();
@@ -61,6 +65,8 @@ export class DaysPageConstructor implements Constructor {
 
     /**
      * Получение сраницы для текущего месяца
+     * 
+     * @author Флис Алексей
      */
     public getCurrentPage() {
         if (this.lastPage && this.lastPage.date.getMonth() === this.month) {
@@ -147,6 +153,8 @@ export class DaysPageConstructor implements Constructor {
 
     /**
      * Получение страницы для следующего месяца
+     * 
+     * @author Флис Алексей
      */
     public getNextPage() {
         this.setDate(new Date(this.year, this.month + 1));
@@ -155,6 +163,8 @@ export class DaysPageConstructor implements Constructor {
 
     /**
      * Получение страницы для предыдущего месяца
+     * 
+     * @author Флис Алексей
      */
     public getPreviousPage() {
         this.setDate(new Date(this.year, this.month - 1));
@@ -163,6 +173,8 @@ export class DaysPageConstructor implements Constructor {
 
     /**
      * Установка текущей даты
+     * 
+     * @author Флис Алексей
      */
     public setDate(date: Date) {
         this.year = date.getFullYear();

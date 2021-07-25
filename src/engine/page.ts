@@ -1,12 +1,12 @@
 import { Item } from "./item";
+import { FormattingOptions } from "@/types/formatting-options.type";
 
 
-export type FormattingOptions = {
-    rows: number, 
-    cols: number,
-    filterable: boolean,
-}
-
+/**
+ * Класс страницы 
+ * 
+ * @author Флис Алексей
+ */
 export class Page {
 
     constructor(
@@ -16,6 +16,11 @@ export class Page {
         public readonly options: FormattingOptions,
     ) {}
 
+    /**
+     * Преобразование странциы в таблицу
+     * 
+     * @author Флис Алексей
+     */
     public toRows() {
         const rows: Item[][] = [];
 
