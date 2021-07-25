@@ -46,7 +46,7 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import { Options, Vue } from 'vue-class-component';
 import { Prop, Watch } from 'vue-property-decorator';
 import { TimePeriodsEnum } from "@/types/time-periods.enum";
@@ -55,6 +55,10 @@ import DecadeItem from './decade-item.vue';
 import DayItem from './day-item.vue';
 import MonthItem from './month-item.vue';
 import initEngine from '../engine/';
+import { OrderedRange } from '@/types/range.type';
+import { Page } from '../engine/page';
+import { DatePicker as DatePickerEngine } from '../engine/date-picker';
+import { Item } from '../engine/item';
 
 
 const timePeriodToComponent = {
@@ -63,6 +67,12 @@ const timePeriodToComponent = {
     [TimePeriodsEnum.DAYS]: 'day-item'
 };
 
+
+/**
+ * Компонент "Календарь"
+ * 
+ * @author Флис Алексей
+ */
 @Options({
     components: {
         SlideControl,
@@ -74,7 +84,7 @@ const timePeriodToComponent = {
     directives: {
         clickOutside: {
             beforeMount: (el, binding) => {
-                el.clickOutsideEvent = (e) => {
+                el.clickOutsideEvent = (e: Event) => {
                     if (!(el === e.target || el.contains(e.target))) {
                         binding.value();
                     }
@@ -88,21 +98,28 @@ const timePeriodToComponent = {
     }
 })
 export default class DatePicker extends Vue {
+    /** Выбранный диапазон дат */
     @Prop({ default: { leftBound: null, rightBound: null}})
-    range;
+    private readonly range!: OrderedRange;
 
-    @Watch('range')
-    onRangeChange() {
-        this.engine.setRange(this.range);
-        this.page = this.engine.getCurrentPage();
-    }
+    /** Текущий период/тип страниц */
+    private currentPeriod = TimePeriodsEnum.DAYS;
 
-    currentPeriod = TimePeriodsEnum.DAYS;
-    tableHeadValues = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
-    page = null;
-    engine = null;
+    /** Массив имен дней недели */
+    private tableHeadValues = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
 
-    created() {
+    /** Модель текущей страницы */
+    private page: Page | null = null;
+
+    /** Движок */
+    private engine: DatePickerEngine | null = null;
+
+    /**
+     * Создание страницы на основе переданного значения диапазона дат
+     * 
+     * @author Флис Алексей
+     */
+    public created() {
         this.engine = this.range.leftBound
             ? initEngine({ date: this.range.leftBound.date })
             : initEngine();
@@ -110,48 +127,110 @@ export default class DatePicker extends Vue {
         this.page = this.engine.getCurrentPage();
     }
 
-    leftSlide() {
-        this.page = this.engine.getPreviousPage();
+    /**
+     * Обновление текущей страницы при изменении выбранного диапазона дат
+     * 
+     * @author Флис Алексей
+     */
+    @Watch('range')
+    public onRangeChange() {
+        (this.engine as DatePickerEngine).setRange(this.range);
+        this.page = (this.engine as DatePickerEngine).getCurrentPage();
     }
 
-    rightSlide() {
-        this.page = this.engine.getNextPage();
+    /**
+     * Переключение на предыдущую страницу
+     * 
+     * @author Флис Алексей
+     */
+    public leftSlide() {
+        this.page = (this.engine as DatePickerEngine).getPreviousPage();
     }
 
-    stepBack() {
+    /**
+     * Переключение на следующую страницу
+     * 
+     * @author Флис Алексей
+     */
+    public rightSlide() {
+        this.page = (this.engine as DatePickerEngine).getNextPage();
+    }
+
+    /**
+     * Возвращение на страницу врехнего уровня ( от дней к десятилетиям )
+     * 
+     * @author Флис Алексей
+     */
+    public stepBack() {
         if (this.currentPeriod >= 1) {
             this.currentPeriod--;
-            this.page = this.engine
-                .setPageConstructor(this.currentPeriod, { date: this.page.date })
+            this.page = (this.engine as DatePickerEngine)
+                .setPageConstructor(this.currentPeriod, { date: (this.page as Page).date })
                 .getCurrentPage();
         }
     }
 
-    onPageUpdate() {
-        this.currentPeriod = this.engine.getCurrentConstructor();
-        this.page = this.engine.getCurrentPage();
+    /**
+     * Обработчик события нажатия на элемент страницы
+     * 
+     * @author Флис Алексей
+     */
+    public onPageUpdate() {
+        this.currentPeriod = (this.engine as DatePickerEngine).getCurrentConstructor();
+        this.page = (this.engine as DatePickerEngine).getCurrentPage();
     }
 
-    onBoundSelect({ bound }) {
+    /**
+     * Обработчик события выбора границы диапазона дат
+     * 
+     * @author Флис Алексей
+     */
+    public onBoundSelect(bound: Item) {
         this.$emit('rangeUpdate', bound);
     }
 
-    onOutsideClick() {
+    /**
+     * Обработчик события клика за пределами компонента
+     * 
+     * @author Флис Алексей
+     */
+    public onOutsideClick() {
         this.$emit('outsideClick');
     }
 
+
+    /**
+     * Получения флага отображения заголовка таблицы с названиями дней недели
+     * 
+     * @author Флис Алексей
+     */
     get isTableHeadVisible() {
         return this.currentPeriod === TimePeriodsEnum.DAYS;
     }
 
+    /**
+     * Получение текущей страницы в формате строк
+     * 
+     * @author Флис Алексей
+     */
     get rowedPage() {
-        return this.page.toRows();
+        return (this.page as Page).toRows();
     }
 
+    /**
+     * Получение заголовка текущей страницы
+     * 
+     * @author Флис Алексей
+     */
     get title() {
-        return this.page.title;
+        return (this.page as Page).title;
     }
 
+    /**
+     * Получение компонента, отображаемого для текущего периода
+     * 
+     * @author Флис Алексей
+     */
     get currentItem() {
       return timePeriodToComponent[this.currentPeriod];
     }

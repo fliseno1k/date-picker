@@ -6,18 +6,27 @@
     >{{ item.value }}</td>
 </template>
 
-<script>
+<script lang="ts">
+import { DatePicker as DatePickerEngine } from '@/engine/date-picker';
 import { Options, Vue } from 'vue-class-component';
 import { Prop } from 'vue-property-decorator';
+import { Item } from '@/engine/item';
 
 Options({})
 export default class DayItem extends Vue {
+    /** Модель элемента */
     @Prop({ default: '' })
-    item
+    private readonly item!: Item;
 
+    /** Движок */
     @Prop({ default: '' })
-    engine
+    private readonly engine!: DatePickerEngine;
 
+    /** 
+     * Получение css-классов элемента в зависимости от его типов 
+     *
+     * @author Флис Алексей 
+     */
     get classes() {
         return this.item.types
             .filter(type => type.length > 0)
@@ -25,8 +34,13 @@ export default class DayItem extends Vue {
             .join(' ');
     }
 
-    onItemSelect() {
-        this.$emit('selectBound', { bound: this.item });
+    /**
+     * Обработчик события клика по элементу
+     * 
+     * @author Флис Алексей
+     */
+    public onItemSelect() {
+        this.$emit('selectBound', this.item);
 
         // if (this.engine.isRangeFull()) {
         //     window.dispatchEvent(new CustomEvent('rangeSelect', {

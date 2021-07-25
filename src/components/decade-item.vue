@@ -6,20 +6,29 @@
     >{{ item.value }}</td>
 </template>
 
-<script>
+<script lang="ts">
+import { DatePicker as DatePickerEngine } from '@/engine/date-picker';
 import { Options, Vue } from 'vue-class-component';
 import { Prop } from 'vue-property-decorator';
+import { Item } from '@/engine/item';
 import { TimePeriodsEnum } from '../types/time-periods.enum';
 
 
 Options({})
 export default class DecadeItem extends Vue {
+    /** Модель элемента */
     @Prop({ default: '' })
-    item
+    private readonly item!: Item;
 
+    /** Движок */
     @Prop({ default: '' })
-    engine
+    private readonly engine!: DatePickerEngine;
 
+    /** 
+     * Получение css-классов элемента в зависимости от его типов 
+     *
+     * @author Флис Алексей 
+     */
     get classes() {
         return this.item.types
             .filter(type => type.length > 0)
@@ -27,6 +36,11 @@ export default class DecadeItem extends Vue {
             .join(' ');
     }
 
+    /**
+     * Обработчик события клика по элементу
+     * 
+     * @author Флис Алексей
+     */
     onItemSelect() {
         this.engine.setPageConstructor(TimePeriodsEnum.MONTHS, { date: this.item.date });
         this.$emit('updatePage');

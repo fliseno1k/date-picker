@@ -22,21 +22,39 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { OrderedRange } from '@/types/range.type';
 import { Options, Vue } from 'vue-class-component';
 import { Prop } from 'vue-property-decorator';
 
+
+/**
+ * Компонент отображения кнопки переключателя и выбранного диапазона
+ * 
+ * @author Флис Алексей
+ */
 @Options({})
 export default class Button extends Vue {
+    /** Упорядоченный диапазон дат */
     @Prop({ default: ''})
-    range;
+    range!: OrderedRange;
 
-    onButtonClick() {
+    /**
+     * Обработчик события нажатия на переключатель календаря
+     * 
+     * @author Флис Алексей
+     */
+    public onButtonClick() {
         this.$emit('togglePicker');
     }
 
-    yyyymmdd(date) {
-        const mm = date.getMonth() + 1; // getMonth() is zero-based
+    /**
+     * Приведение объекта даты к виду день/месяц/год
+     * 
+     * @author Флис Алексей
+     */
+    public ddmmyyyy(date: Date) {
+        const mm = date.getMonth() + 1;
         const dd = date.getDate();
 
         return [
@@ -46,20 +64,34 @@ export default class Button extends Vue {
         ].join('/');
     }
 
-    onClearRange() {
+    /**
+     * Создание страницы на основе переданного значения диапазона дат
+     * 
+     * @author Флис Алексей
+     */
+    public onClearRange() {
         this.$emit('clearRange');
     }
 
+    /**
+     * Получение заголовка для текущего диапазона дат
+     * 
+     * @author Флис Алексей
+     */
     get title() {
         if (!this.range.leftBound || !this.range.rightBound) return '';
-        if (this.range.leftBound.date.getTime() === this.range.rightBound.date.getTime()) return this.yyyymmdd(this.range.leftBound.date);
-        return this.yyyymmdd(this.range.leftBound.date) + ' - ' + this.yyyymmdd(this.range.rightBound.date) || '';
+        if (this.range.leftBound.date.getTime() === this.range.rightBound.date.getTime()) return this.ddmmyyyy(this.range.leftBound.date);
+        return this.ddmmyyyy(this.range.leftBound.date) + ' - ' + this.ddmmyyyy(this.range.rightBound.date) || '';
     }
 
+    /**
+     * Получение флага отображения заголовка диапазаона дат
+     * 
+     * @author Флис Алексей
+     */
     get isTitleVisible() {
         return this.range.leftBound;
     }
-
 }
 </script>
 

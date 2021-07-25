@@ -28,6 +28,11 @@ import DatePickerCalendar from './components/date-picker-calendar.vue';
 import DatePickerPreview from './components/date-picker-preview.vue';
 import { DateRange } from "@/engine/date-range";
 
+/**
+ * Компонент "Date Picker"
+ * 
+ * @author Флис Алексей
+ */
 @Options({
     components: {
         DatePickerCalendar,
@@ -39,7 +44,7 @@ export default class App extends Vue {
     calendarStyles = {};
     dateRange = new DateRange();
 
-    mounted() {
+    public mounted() {
         const { right, width } = (this.$refs.datePicker as HTMLElement).getBoundingClientRect();
         const property = right - width / 2 > window.innerWidth / 2 ? 'right' : 'left';
 
@@ -50,19 +55,19 @@ export default class App extends Vue {
         };
     }
 
-    onPickerToggle() {
+    public onPickerToggle() {
         this.isPickerOpen = !this.isPickerOpen;
     }
 
-    onOutsideClick() {
+    public onOutsideClick() {
         this.isPickerOpen = false;
     }
 
-    onRangeUpdate(bound: any) {
+    public onRangeUpdate(bound: any) {
         this.dateRange.pushBound(bound);
     }
 
-    onRangeClear() {
+    public onRangeClear() {
         this.dateRange.clearBounds();
     }
 
@@ -71,6 +76,7 @@ export default class App extends Vue {
     }
 }
 </script>
+
 <style>
 
 * {
